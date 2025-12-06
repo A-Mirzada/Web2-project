@@ -332,6 +332,41 @@
       color: white;
     }
 
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0 30px;
+    }
+    
+    .filter-bar button {
+      padding: 8px 18px;
+      border: 1px solid #111;
+      background: white;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: 0.2s;
+    }
+    
+    .filter-bar button:hover {
+      background: #111;
+      color: white;
+    }
+
+    .active-filter {
+      background: #111 !important;
+      color: white !important;
+      border-color: #111 !important;
+      font-weight: bold;
+      transform: translateY(-2px);
+    }
+    
+    .filter-bar button {
+      transition: all 0.2s ease;
+    }
+    
+    
+
     
     @media (min-width: 640px) {
       .container { padding: 3rem 1.5rem; }

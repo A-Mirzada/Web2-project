@@ -15,7 +15,7 @@ const Footer = () => {
               <h4>GET HELP</h4>
               <ul>
                
-                <li><a href="#">Contact Us</a></li>
+                <li><a href="/Contact">Contact Us</a></li>
               </ul>
             </div>
 

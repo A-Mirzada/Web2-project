@@ -1,89 +1,92 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useContext } from "react";
+import { CartContext } from "../Context/CartContext";
+import { useNavigate } from "react-router-dom";
 import "../Styles/Men.css";
 
 import Unleash from "../Assets/Poster.jpg";
 import Airmax from "../Assets/airmax.png";
 import Tech from "../Assets/tech.jpg";
 import Run from "../Assets/running.jpg";
-import airforce from '../Assets/airforce.png';
-import jordan from '../Assets/jordan1.png';
-import drifit from '../Assets/drifit.png';
-import jacket from '../Assets/jacket.png';
-import cap from '../Assets/cap.jpg';
-import bag from '../Assets/brasilia.png';
-import vomero from '../Assets/vomero.png';
-import jordan1 from '../Assets/jordan1.jpg';
-// Static product data WITHOUT images
-const staticProducts = [
-  {
-    name: "Nike Air Force",
-    category: "Shoes",
-    price: "$130",
-    image: airforce  
-  },
-  {
-    name: "Nike Air Jordan High",
-    category: "Shoes",
-    price: "$160",
-    image: jordan 
-  },
-  {
-    name: "Nike Dri-FIT Tee",
-    category: "Clothing",
-    price: "$35",
-    image: drifit
-  },
-  {
-    name: "Nike Jacket",
-    category: "Clothing",
-    price: "$70",
-    image: jacket   
-  },
-  {
-    name: "Nike Cap",
-    category: "Accessories",
-    price: "$25",
-    image: cap   
-  },
-  {
-    name: "Nike Bag",
-    category: "Accessories",
-    price: "$55",
-    image: bag  
-  },
-  {
-    name: "Nike Vomero",
-    category: "Shoes",
-    price: "$85",
-    image: vomero  
-  },
-  {
-    name: "Nike Air jordan Low",
-    category: "Shoes",
-    price: "$75",
-    image: jordan1  
-  }
-
-];
 
 const Men = () => {
+  const [products, setProducts] = useState([]);
   const [visibleCount, setVisibleCount] = useState(4);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
+
+
+  // FILTER STATE
+  const [filter, setFilter] = useState("all");
+
+  // Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+
+        const res = await fetch("http://localhost:5000/api/products?section=men");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data = await res.json();
+        setProducts(data);
+
+      } catch (err) {
+        console.error(err);
+        setError("Could not load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleLoadMore = () => {
-    setVisibleCount(prev => prev + 4);
+    setVisibleCount((prev) => prev + 4);
   };
+
+  // FILTERED PRODUCTS LOGIC
+  const filteredProducts = products.filter((p) => {
+    if (filter === "all") return true;
+    const cat = (p.category || "").toLowerCase();
+
+    if (filter === "Shoes") {
+      return cat.includes("shoes");
+    }
+    if (filter === "Clothing") {
+      return (
+        cat.includes("clothing") ||
+        cat.includes("hoodies") ||
+        cat.includes("jackets") ||
+        cat.includes("shorts") ||
+        cat.includes("fleece") ||
+        cat.includes("shirts")
+      );
+    }
+    if (filter === "Accessories") {
+      return cat.includes("accessories");
+    }
+
+    return true;
+  });
 
   return (
     <>
       <main className="container">
 
-        
+        {/* PAGE HEADER */}
         <header className="page-header">
           <h1>Men's Collection</h1>
           <p>Explore the latest in performance and style. Built for the modern athlete.</p>
         </header>
 
-       
+        {/* FEATURED BANNER */}
         <div className="featured-banner">
           <img src={Unleash} alt="Featured collection banner" />
           <div className="featured-banner-content">
@@ -93,7 +96,7 @@ const Men = () => {
           </div>
         </div>
 
-       
+        {/* TRENDING SECTION */}
         <section className="trending-section">
           <h2 className="section-heading">Trending Now</h2>
 
@@ -127,37 +130,84 @@ const Men = () => {
           </div>
         </section>
 
-       
+        {/* PRODUCT GRID WITH FILTERS */}
         <section>
           <h2 className="section-heading">Shop The Essentials</h2>
 
-          <div className="product-grid">
-            {staticProducts.slice(0, visibleCount).map((product, index) => (
-              <div className="product-card" key={index}>
-                
-                <img src={product.image} alt={product.name} />
-                <div className="product-info">
-                  <h3>{product.name}</h3>
-                  <p className="category">{product.category}</p>
-                  <p className="price">{product.price}</p>
-                  <button className="add-button">Add to cart</button>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* FILTER BAR */}
+          <div className="filter-bar">
 
-          {visibleCount < staticProducts.length && (
-            <div className="load-more-container">
-              <button className="load-more-button" onClick={handleLoadMore}>
-                Load More
-              </button>
-            </div>
+      <button 
+       className={filter === "all" ? "active-filter" : ""}
+         onClick={() => setFilter("all")}>
+  
+          All
+        </button>
+
+  <button 
+    className={filter === "Shoes" ? "active-filter" : ""}
+    onClick={() => setFilter("Shoes")}>
+  
+    Shoes
+       </button>
+
+  <button 
+    className={filter === "Clothing" ? "active-filter" : ""}
+    onClick={() => setFilter("Clothing")}>
+  
+    Clothing
+       </button>
+
+  <button 
+    className={filter === "Accessories" ? "active-filter" : ""}
+    onClick={() => setFilter("Accessories")}>
+  
+    Accessories
+   </button>
+</div>
+
+
+          {loading && <p>Loading products...</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
+          {!loading && !error && (
+            <>
+              <div className="product-grid">
+                {filteredProducts.slice(0, visibleCount).map((product) => (
+                  <div className="product-card" key={product.id} onClick={() => navigate(`/product/${product.id}`)}style={{ cursor: "pointer" }}>
+                    <img src={product.image_url} alt={product.name} />
+
+                    <div className="product-info">
+                      <h3>{product.name}</h3>
+                      <p className="category">{product.category}</p>
+                      <p className="price">${Number(product.price).toFixed(2)}</p>
+                      <button 
+                                      className="add-button"
+                                   onClick={() => {
+                                    console.log("Product added:", product);
+                                    addToCart(product);
+                                   }}>
+
+                                    Add to cart
+                                              </button>
+
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {visibleCount < filteredProducts.length && (
+                <div className="load-more-container">
+                  <button className="load-more-button" onClick={handleLoadMore}>
+                    Load More
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
 
       </main>
-
-      
     </>
   );
 };
