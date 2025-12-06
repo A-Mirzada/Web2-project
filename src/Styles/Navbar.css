@@ -1,25 +1,17 @@
-
-
-
+/* RESET */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
-h1{
-    
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #111;
 
-}
-body {
+body, a, ul, button {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #111;
 }
 
 a {
     text-decoration: none;
-    color: inherit;
 }
 
 ul {
@@ -32,135 +24,203 @@ button {
     cursor: pointer;
 }
 
-.button1 {
-    width: 9em;
-    height: 3em;
-    border-radius: 30em;
-    font-size: 15px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    border: none;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-    box-shadow: 6px 6px 12px #c5c5c5,
-                -6px -6px 12px #ffffff;
-    margin-left: 40px;
-   }
-   
-   .button1::before {
-    content: '';
-    width: 0;
-    height: 3em;
-    border-radius: 30em;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-image: linear-gradient(to right, red 0%, #f98e47 100%);
-    transition: .5s ease;
-    display: block;
-    z-index: -1;
-   }
-   
-   .button1:hover::before {
-    width: 9em;
-   }
-
-
+/* ===============================
+   MODERN NAVBAR BASE
+=============================== */
 .main-nav {
-    display: flex; 
-    position: relative; 
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 10px 5%;
     width: 100%;
-    background-color: #fff;
-    border-bottom: 1px solid #f0f0f0;
+    background: white;
 }
 
-img{
-    width: 6%;
-    margin-right: 100px;
-}
-h1{
-    font-family:'Franklin Gothic Medium',  sans-serif;
+/* ===============================
+   LOGO
+=============================== */
+.main-nav img {
+    width: 75px;
+    height: auto;
+    margin-right: 40px;
 }
 
+@media (max-width: 768px) {
+    .main-nav img {
+        width: 58px;
+        margin-right: 20px;
+    }
+}
+
+/* ===============================
+   NAV LINKS (DESKTOP)
+=============================== */
 .nav-links {
     display: flex;
     justify-content: center;
     gap: 24px;
-    
-  
-    position: absolute;
-    left: 45%;
-    transform: translateX(-50%);
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .nav-links li a {
     font-size: 16px;
     font-weight: 500;
-    padding: 24px 0 ;
-
+    padding: 20px 0;
     border-bottom: 2px solid transparent;
-    transition: border-bottom-color 0.2s ease;
-    
+    transition: 0.2s ease;
 }
 
 .nav-links li a:hover {
     border-bottom-color: #111;
 }
 
+/* Shrink spacing and search input on medium screens */
+@media (max-width: 1100px) {
+    .nav-links {
+        gap: 16px;
+    }
 
+    .search-container input {
+        width: 110px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .search-container input {
+        width: 90px;
+    }
+}
+
+/* FORCE hide links on mobile */
+@media (max-width: 960px) {
+    .nav-links {
+        display: none !important;
+        visibility: hidden;
+        opacity: 0;
+    }
+}
+
+/* ===============================
+   RIGHT SIDE ICONS
+=============================== */
 .nav-icons {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
     gap: 16px;
-    
-    
     margin-left: auto;
 }
 
+/* ===============================
+   SEARCH BAR
+=============================== */
 .search-container {
     display: flex;
     align-items: center;
     background-color: #f5f5f5;
     border-radius: 30px;
-    padding: 8px 12px;
+    padding: 7px 12px;
 }
 
 .search-container .search-icon {
-    margin-right: 8px;
+    margin-right: 6px;
 }
 
 .search-container input {
     border: none;
     outline: none;
     background: transparent;
-    font-size: 16px;
+    font-size: 15px;
     width: 150px;
 }
 
-.icon-btn svg {
-    width: 24px;
-    height: 24px;
+/* Hide search bar fully on mobile */
+@media (max-width: 960px) {
+    .search-container {
+        display: none !important;
+    }
 }
 
+/* ===============================
+   LOGIN BUTTON
+=============================== */
+.button1 {
+    width: 8.5em;
+    height: 2.7em;
+    border-radius: 30em;
+    font-size: 14px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    margin-left: 20px;
+    box-shadow: 6px 6px 12px #c5c5c5,
+                -6px -6px 12px #ffffff;
+}
+
+.button1::before {
+    content: '';
+    width: 0;
+    height: 2.7em;
+    border-radius: 30em;
+    position: absolute;
+    top: 0; left: 0;
+    background-image: linear-gradient(to right, red 0%, #f98e47 100%);
+    transition: .4s ease;
+    z-index: -1;
+}
+
+.button1:hover::before {
+    width: 100%;
+}
+
+/* ===============================
+   CART BADGE
+=============================== */
+.cart-btn {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -6px;
+    background: red;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+
+/* ===============================
+   HAMBURGER ICON
+=============================== */
 .hamburger {
-    display: none; 
+    display: none;
 }
 
+@media (max-width: 960px) {
+    .hamburger {
+        display: block !important;
+    }
+}
 
+/* ===============================
+   MOBILE MENU
+=============================== */
 .mobile-menu {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+    top: 0; left: 0;
+    width: 75%;
+    max-width: 350px;
     height: 100vh;
     background-color: #fff;
-    z-index: 1000;
-    padding: 60px 5% 5%;
+    z-index: 2000;
+    padding: 60px 30px;
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
+    border-right: 1px solid #eee;
 }
 
 .mobile-menu.active {
@@ -170,70 +230,61 @@ h1{
 .mobile-menu .close-btn {
     position: absolute;
     top: 20px;
-    right: 5%;
-}
-
-.mobile-menu .close-btn svg {
-    width: 30px;
-    height: 30px;
+    right: 20px;
 }
 
 .mobile-menu ul {
     display: flex;
     flex-direction: column;
+    gap: 22px;
 }
 
 .mobile-menu ul li a {
-    display: block;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 600;
-    padding: 16px 0;
+    padding: 6px 0;
 }
 
-.mobile-menu .mobile-sub-links {
+.mobile-sub-links {
     margin-top: 32px;
     padding-top: 32px;
     border-top: 1px solid #f0f0f0;
 }
 
-.mobile-menu .mobile-sub-links a {
+.mobile-sub-links a {
     display: block;
     font-size: 16px;
     font-weight: 500;
     color: #757575;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
-
-@media (max-width: 960px) {
-   
-    .nav-links {
-        display: none; 
-    }
-
-    .search-container {
-        display: none; 
-    }
-
-    .heart-icon {
-        display: none; 
-    }
-
-
-    .hamburger {
-        display: block; 
-    }
-
-    
+/* ===============================
+   RESPONSIVE FIXES
+=============================== */
+@media (max-width: 600px) {
     .main-nav {
-        display: flex;
-        justify-content: flex-end; 
-        align-items: center;
-        padding: 12px 5%;
-        position: static; 
+        padding: 10px 4%;
     }
 
     .nav-icons {
-        margin-left: 0; 
+        gap: 12px;
+    }
+
+    .cart-badge {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+}
+
+@media (max-width: 400px) {
+    .main-nav img {
+        width: 52px;
+    }
+
+    .button1 {
+        width: 7em;
+        height: 2.5em;
+        font-size: 13px;
     }
 }
