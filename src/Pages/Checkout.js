@@ -1,63 +1,136 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { CartContext } from "../Context/CartContext";
+import { useNavigate } from "react-router-dom";
 import "../Styles/Checkout.css";
 
 const Checkout = () => {
-  const { cart } = useContext(CartContext);
+  const { cart, clearCart } = useContext(CartContext);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const navigate = useNavigate();
 
-  const total = cart.reduce((sum, item) => {
-    return sum + item.price * item.qty;
-  }, 0);
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
+  // ===============================
+  // PLACE ORDER → SEND TO BACKEND
+  // ===============================
+  const placeOrder = async (e) => {
+    e.preventDefault();
+
+    if (cart.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!token || !user) {
+        alert("You must be logged in.");
+        return;
+      }
+
+      const response = await fetch("http://localhost:5000/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          items: cart,
+          total: total,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(data);
+        alert("Order failed");
+        return;
+      }
+
+      clearCart(); // empty the cart
+      setOrderPlaced(true); // show success popup
+
+    } catch (err) {
+      console.error("Order error:", err);
+      alert("Order failed due to server error.");
+    }
+  };
+
+  // ===============================
+  // SUCCESS POPUP
+  // ===============================
+  if (orderPlaced) {
+    return (
+      <div className="order-success-container">
+        <div className="order-success-box">
+          <h2>Order successfully placed!</h2>
+          <p>Thank you for shopping with us.</p>
+
+          <button className="view-orders-btn" onClick={() => navigate("/orders")}>
+            View Order
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ===============================
+  // CHECKOUT PAGE
+  // ===============================
   return (
     <main className="checkout-container">
       <h1>Checkout</h1>
 
       <div className="checkout-grid">
 
-        {/* LEFT SIDE — FORM */}
+        {/* LEFT: FORM */}
         <div className="checkout-form">
-
           <h2>Shipping Information</h2>
 
-          <form>
+          <form onSubmit={placeOrder}>
             <label>Full Name</label>
-            <input type="text" placeholder="John Doe" required />
+            <input type="text" required />
 
             <label>Email</label>
-            <input type="email" placeholder="email@example.com" required />
+            <input type="email" required />
 
             <label>Address</label>
-            <input type="text" placeholder="123 Street Name" required />
+            <input type="text" required />
 
             <label>City</label>
-            <input type="text" placeholder="City" required />
+            <input type="text" required />
 
             <label>Country</label>
-            <input type="text" placeholder="Country" required />
+            <input type="text" required />
 
             <label>Phone Number</label>
-            <input type="text" placeholder="+961 70 123 456" required />
+            <input type="text" required />
 
-            <h2>Payment Method</h2>
+          <h2>Payment Method</h2>
 
-            <div className="payment-options">
-              <label>
-                <input type="radio" name="payment" defaultChecked />
-                Credit / Debit Card
-              </label>
+          <div className="payment-options">
+            <label className="payment-option">
+              <input type="radio" name="payment" defaultChecked />
+              <span>Credit / Debit Card</span>
+            </label>
 
-              <label>
-                <input type="radio" name="payment" />
-                Cash on Delivery
-              </label>
-            </div>
+            <label className="payment-option">
+              <input type="radio" name="payment" />
+              <span>Cash on Delivery</span>
+            </label>
+          </div>
 
-            <button className="place-order-btn">Place Order</button>
+
+            <button className="place-order-btn" type="submit">
+              Place Order
+            </button>
           </form>
         </div>
 
-        {/* RIGHT SIDE — SUMMARY */}
+        {/* RIGHT: SUMMARY */}
         <div className="checkout-summary">
           <h2>Order Summary</h2>
 
@@ -70,16 +143,10 @@ const Checkout = () => {
                   <h4>{item.name}</h4>
                   <p>Qty: {item.qty}</p>
 
-{item.chosenSize && (
-  <p className="summary-variation">Size: {item.chosenSize}</p>
-)}
+                  {item.chosenSize && <p>Size: {item.chosenSize}</p>}
+                  {item.chosenColor && <p>Color: {item.chosenColor}</p>}
 
-{item.chosenColor && (
-  <p className="summary-variation">Color: {item.chosenColor}</p>
-)}
-
-<p>${item.price}</p>
-
+                  <p>${Number(item.price).toFixed(2)}</p>
                 </div>
               </div>
             ))}

@@ -1,5 +1,7 @@
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import "../Styles/AuthModal.css";
+import { useAuth } from "../Context/AuthContext";
+
 
 const AuthModal = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
@@ -10,6 +12,8 @@ const AuthModal = forwardRef((props, ref) => {
     email: "",
     password: "",
   });
+
+  const { login } = useAuth();
 
   const [error, setError] = useState("");
 
@@ -78,13 +82,18 @@ const AuthModal = forwardRef((props, ref) => {
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role);
     localStorage.setItem("name", data.name);
+    localStorage.setItem("user", JSON.stringify({ 
+        id: data.id,
+        name: data.name,
+        role: data.role 
+    }));
+
+    // update AuthContext
+    login({ name: data.name, role: data.role });
 
     setOpen(false);
-
-    // Inform Navbar (parent) user logged in
-    if (props.onLogin) props.onLogin();
-
     alert("Login successful");
+
   };
 
   return (

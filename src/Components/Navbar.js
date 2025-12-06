@@ -4,6 +4,8 @@ import Logo from '../Assets/brand.png';
 import AuthModal from './AuthModal';
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "../Context/CartContext";
+import { useAuth } from "../Context/AuthContext";
+
 
 /* ICONS */
 const SearchIcon = () => (
@@ -38,6 +40,8 @@ const CloseIcon = () => (
 );
 
 const Navbar = () => {
+
+    const { user, logout } = useAuth();
 
     const { cart } = useContext(CartContext);  // CART BADGE
 
@@ -118,14 +122,20 @@ const Navbar = () => {
 
                     {/* NAVIGATION LINKS */}
                     <ul className="nav-links">
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/Men">Men</a></li>
-                        <li><a href="/Women">Women</a></li>
-                        <li><a href="/Kids">Kids</a></li>
-                        <li><a href="/Contact">Contact Us</a></li>
+                       <li><a href="/">Home</a></li>
+                       <li><a href="/Men">Men</a></li>
+                       <li><a href="/Women">Women</a></li>
+                       <li><a href="/Kids">Kids</a></li>
+                       <li><a href="/Contact">Contact Us</a></li>
 
-                        {role === "admin" && <li><a href="/admin">Add Product</a></li>}
+                        {user && (
+                        <li><a href="/orders">My Orders</a></li>
+                        )}
+
+
+                 {role === "admin" && <li><a href="/admin">Add Product</a></li>}
                     </ul>
+
 
                     {/* RIGHT SIDE ICONS */}
                     <div className="nav-icons">
@@ -191,6 +201,10 @@ const Navbar = () => {
                     <li><a href="/Men">Men</a></li>
                     <li><a href="/Women">Women</a></li>
                     <li><a href="/Kids">Kids</a></li>
+
+                    {user && (
+                    <li><a href="/orders">My Orders</a></li>
+                    )}
 
                     {role === "admin" && (
                         <li><a href="/admin">Add Product</a></li>

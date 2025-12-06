@@ -14,6 +14,8 @@ import SearchResults from "./Pages/SearchResults";
 import Cart from "./Pages/Cart";
 import Checkout from "./Pages/Checkout";
 import ProductDetails from "./Pages/ProductDetails";
+import Orders from "./Pages/Orders.js";
+
 
 
 
@@ -37,6 +39,8 @@ function App() {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/orders" element={<Orders />} />
+
 
           {/* Protected Admin Route */}
           <Route

@@ -3,50 +3,77 @@ import { createContext, useState, useEffect } from "react";
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
-
-  // Load cart from localStorage
-  useEffect(() => {
+  // Load cart from localStorage on first load
+  const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }, []);
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  // Save cart to localStorage every time it changes
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  // Add item to cart
+  // ===========================
+  // ADD ITEM TO CART (fixed)
+  // ===========================
   const addToCart = (item) => {
     setCart((prev) => {
       const existing = prev.find((p) => p.id === item.id);
+
       if (existing) {
+        // Increase quantity if item already exists
         return prev.map((p) =>
           p.id === item.id ? { ...p, qty: p.qty + 1 } : p
         );
       }
-      return [...prev, { ...item, qty: 1 }];
+
+      // NEW item → ensure price is always a number
+      return [
+        ...prev,
+        { 
+          ...item, 
+          price: Number(item.price),   // IMPORTANT FIX
+          qty: 1 
+        }
+      ];
     });
   };
 
-  // Remove a single item
+  // ===========================
+  // REMOVE ITEM COMPLETELY
+  // ===========================
   const removeFromCart = (id) => {
     setCart((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // Change quantity
+  // ===========================
+  // CHANGE QTY (+/-)
+  // ===========================
   const changeQty = (id, amount) => {
     setCart((prev) =>
       prev
         .map((p) =>
-          p.id === id ? { ...p, qty: Math.max(1, p.qty + amount) } : p
+          p.id === id
+            ? { ...p, qty: Math.max(1, p.qty + amount) }
+            : p
         )
         .filter((p) => p.qty > 0)
     );
   };
 
+  // ===========================
+  // CLEAR CART (used after order success)
+  // ===========================
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart");
+  };
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, changeQty }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, changeQty, clearCart }}
+    >
       {children}
     </CartContext.Provider>
   );

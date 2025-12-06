@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const pool = require('./db');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const orderRoutes = require("./routes/Orders");
 
 
 dotenv.config();
@@ -36,6 +37,7 @@ const verifyToken = (req, res, next) => {
 app.use(cors({ origin: 'http://localhost:3000' })); // Vite dev server
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+app.use("/api/orders", orderRoutes);
 
 
 // Test route
@@ -231,7 +233,8 @@ app.post("/api/login", async (req, res) => {
         message: "Login successful",
         token,
         role: user.role,
-        name: user.name
+        name: user.name,
+        id: user.id
       });
   
     } catch (err) {
@@ -292,9 +295,6 @@ app.delete("/api/messages/:id", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Failed to delete message" });
   }
 });
-
-
-
 
 // Start server
 const PORT = process.env.PORT || 5000;

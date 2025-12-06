@@ -4,6 +4,7 @@ import "../Styles/Admin.css";
 const Admin = () => {
   const [products, setProducts] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -16,9 +17,9 @@ const Admin = () => {
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  // -------------------------
+  // ==========================
   // FETCH PRODUCTS
-  // -------------------------
+  // ==========================
   const fetchProducts = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/products");
@@ -29,30 +30,50 @@ const Admin = () => {
     }
   };
 
-  // -------------------------
-  // FETCH MESSAGES (ADMIN ONLY)
-  // -------------------------
+  // ==========================
+  // FETCH ORDERS (ADMIN)
+  // ==========================
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("http://localhost:5000/api/orders/all", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        console.error("Orders API error:", data);
+        setOrders([]);
+        return;
+      }
+
+      setOrders(data);
+    } catch (err) {
+      console.error("Failed to load orders:", err);
+      setOrders([]);
+    }
+  };
+
+  // ==========================
+  // FETCH CONTACT MESSAGES
+  // ==========================
   const fetchMessages = async () => {
     try {
       const token = localStorage.getItem("token");
 
       const res = await fetch("http://localhost:5000/api/messages", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       const data = await res.json();
 
-      // Prevent crash if error object returned
       if (!Array.isArray(data)) {
-        console.error("Messages API error:", data);
         setMessages([]);
         return;
       }
 
       setMessages(data);
-
     } catch (err) {
       console.error("Failed to load messages:", err);
       setMessages([]);
@@ -61,19 +82,20 @@ const Admin = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchOrders();
     fetchMessages();
   }, []);
 
-  // -------------------------
-  // FORM INPUT CHANGE
-  // -------------------------
+  // ==========================
+  // FORM CHANGE
+  // ==========================
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // -------------------------
+  // ==========================
   // IMAGE UPLOAD
-  // -------------------------
+  // ==========================
   const handleImageUpload = async () => {
     if (!imageFile) return;
 
@@ -84,7 +106,7 @@ const Admin = () => {
 
     const res = await fetch("http://localhost:5000/api/upload", {
       method: "POST",
-      body: formData
+      body: formData,
     });
 
     const data = await res.json();
@@ -98,9 +120,9 @@ const Admin = () => {
     }
   };
 
-  // -------------------------
+  // ==========================
   // ADD PRODUCT
-  // -------------------------
+  // ==========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -120,9 +142,9 @@ const Admin = () => {
     }
   };
 
-  // -------------------------
+  // ==========================
   // DELETE PRODUCT
-  // -------------------------
+  // ==========================
   const deleteProduct = async (id) => {
     if (!window.confirm("Delete this product?")) return;
 
@@ -130,16 +152,13 @@ const Admin = () => {
       method: "DELETE",
     });
 
-    if (res.ok) {
-      fetchProducts();
-    } else {
-      alert("Failed to delete product");
-    }
+    if (res.ok) fetchProducts();
+    else alert("Failed to delete product");
   };
 
-  // -------------------------
+  // ==========================
   // DELETE MESSAGE
-  // -------------------------
+  // ==========================
   const deleteMessage = async (id) => {
     if (!window.confirm("Delete this message?")) return;
 
@@ -147,70 +166,33 @@ const Admin = () => {
 
     const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (res.ok) {
-      fetchMessages();
-    } else {
-      alert("Failed to delete message");
-    }
+    if (res.ok) fetchMessages();
+    else alert("Failed to delete message");
   };
 
   return (
     <div className="admin-container">
       <h1 className="admin-title">Admin Dashboard</h1>
 
-      {/* ------------------------------------------------ */}
-      {/* PRODUCT CREATION AREA */}
-      {/* ------------------------------------------------ */}
+      {/* ADD PRODUCT */}
       <h2 className="admin-section-title">Add Product</h2>
 
       <form className="admin-form" onSubmit={handleSubmit}>
-        <input
-          name="name"
-          placeholder="Product Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="category"
-          placeholder="Category"
-          value={form.category}
-          onChange={handleChange}
-          required
-        />
-
-        <select
-          name="section"
-          value={form.section}
-          onChange={handleChange}
-          required
-        >
+        <input name="name" placeholder="Product Name" value={form.name} onChange={handleChange} required />
+        <input name="category" placeholder="Category" value={form.category} onChange={handleChange} required />
+        <select name="section" value={form.section} onChange={handleChange} required>
           <option value="">Select Section</option>
           <option value="men">Men</option>
           <option value="women">Women</option>
           <option value="kids">Kids</option>
         </select>
 
-        <input
-          name="price"
-          placeholder="Price"
-          value={form.price}
-          onChange={handleChange}
-          required
-        />
+        <input name="price" placeholder="Price" value={form.price} onChange={handleChange} required />
 
-        {/* IMAGE UPLOAD */}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files[0])}
-        />
+        <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
 
         <button
           type="button"
@@ -221,7 +203,6 @@ const Admin = () => {
           {uploading ? "Uploading..." : "Upload Image"}
         </button>
 
-        {/* Auto-filled image URL */}
         <input
           name="imageUrl"
           placeholder="Image URL (auto-filled)"
@@ -235,9 +216,7 @@ const Admin = () => {
         </button>
       </form>
 
-      {/* ------------------------------------------------ */}
-      {/* PRODUCT LIST */}
-      {/* ------------------------------------------------ */}
+      {/* PRODUCTS */}
       <h2 className="admin-section-title">All Products</h2>
 
       <div className="product-list">
@@ -247,23 +226,60 @@ const Admin = () => {
             <h3>{p.name}</h3>
             <p>{p.category}</p>
             <p>${Number(p.price).toFixed(2)}</p>
-            <p style={{ fontSize: "0.9rem", color: "#777" }}>({p.section})</p>
+            <p className="product-section">({p.section})</p>
 
-            <button
-              className="delete-btn"
-              onClick={() => deleteProduct(p.id)}
-            >
+            <button className="delete-btn" onClick={() => deleteProduct(p.id)}>
               Delete
             </button>
           </div>
         ))}
       </div>
 
-      {/* ------------------------------------------------ */}
-      {/* MESSAGES INBOX */}
-      {/* ------------------------------------------------ */}
-      <h2 className="admin-section-title">Messages</h2>
+      {/* ORDERS */}
+      <h2 className="admin-section-title">All Orders</h2>
 
+      <div className="orders-admin-list">
+        {orders.length === 0 ? (
+          <p>No orders placed yet.</p>
+        ) : (
+          orders.map((order) => (
+            <div key={order.id} className="admin-order-card">
+              
+              <h2 className="admin-order-title">Order #{order.id}</h2>
+              <p className="admin-order-date">{order.created_at}</p>
+
+              <p className="admin-order-total">
+                <strong>Total:</strong> ${Number(order.total).toFixed(2)}
+              </p>
+
+              <p className="admin-order-user">
+                <strong>User ID:</strong> {order.user_id}
+              </p>
+
+              <div className="admin-order-items">
+                {order.items.map((item, i) => (
+                  <div key={i} className="admin-order-item-card">
+                    
+                    <h4 className="admin-item-name">{item.name || item.NAME}</h4>
+
+                    <div className="admin-item-details">
+                      <p><strong>Qty:</strong> {item.qty}</p>
+                      {item.chosenSize && <p><strong>Size:</strong> {item.chosenSize}</p>}
+                      {item.chosenColor && <p><strong>Color:</strong> {item.chosenColor}</p>}
+                      <p><strong>Price:</strong> ${Number(item.price).toFixed(2)}</p>
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+
+      {/* MESSAGES */}
+      <h2 className="admin-section-title">Messages</h2>
       <div className="messages-list">
         {messages.length === 0 ? (
           <p>No messages yet.</p>
@@ -274,10 +290,7 @@ const Admin = () => {
               <p><strong>Email:</strong> {msg.email}</p>
               <p className="message-text">{msg.message}</p>
 
-              <button
-                className="delete-btn"
-                onClick={() => deleteMessage(msg.id)}
-              >
+              <button className="delete-btn" onClick={() => deleteMessage(msg.id)}>
                 Delete
               </button>
             </div>
