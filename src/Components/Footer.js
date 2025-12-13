@@ -22,10 +22,9 @@ const Footer = () => {
             <div className="footer-column">
               <h4>ABOUT NIKE</h4>
               <ul>
-                <li><a href="#">News</a></li>
-                <li><a href="#">Careers</a></li>
-                <li><a href="#">Investors</a></li>
-                <li><a href="#">Sustainability</a></li>
+                <li><a href="https://about.nike.com/en/newsroom">News</a></li>
+                <li><a href="https://careers.nike.com/">Careers</a></li>
+                <li><a href="https://about.nike.com/en/mission/focus-areas/sustainability">Sustainability</a></li>
               </ul>
             </div>
 
